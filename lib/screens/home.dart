@@ -8,10 +8,13 @@ import 'package:chatico/widgets/bottom_sheet_header_nav_item.dart';
 import 'package:chatico/widgets/bottom_sheet_menu_item.dart';
 import 'package:chatico/widgets/loader.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_socket_io/flutter_socket_io.dart';
 import 'package:flutter_socket_io/socket_io_manager.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -35,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     this.initSocket().then((data) {
       print('CONNECTED TO SOCKET!');
+      _initOneSignal();
       return;
     });
 
@@ -43,6 +47,22 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     super.initState();
+  }
+
+  // move this logic to login screen
+  _initOneSignal() {
+    OneSignal.shared.init('5f018259-14a3-47d1-bb4f-8e7542afe69d');
+    OneSignal.shared
+        .setInFocusDisplayType(OSNotificationDisplayType.notification);
+    OneSignal.shared.setNotificationReceivedHandler((notification) {
+      print(notification);
+    });
+
+    //getting player id
+    OneSignal.shared.getPermissionSubscriptionState().then((status) {
+      print('status');
+      print(status.subscriptionStatus.userId);
+    }); 
   }
 
   _socketStatus(dynamic data) {
@@ -72,6 +92,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void goToProfile() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => ProfileScreen()));
+  }
+
+  void shareApp() async {
+    await Share.share('Download Chatico and start using it right now!',
+        subject: 'Chatico');
   }
 
   void logOut() async {
@@ -239,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       BottomSheetMenuItem(
                                         icon: Icons.share,
                                         label: 'Share',
-                                        toDo: () {},
+                                        toDo: this.shareApp,
                                       ),
                                       BottomSheetMenuItem(
                                         icon: Icons.power_settings_new,

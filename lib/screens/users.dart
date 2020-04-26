@@ -10,9 +10,10 @@ class UsersScreen extends StatefulWidget {
 }
 
 class _UsersScreenState extends State<UsersScreen> {
-  final storage = new FlutterSecureStorage();
   String token;
   String userId;
+  bool loading = true;
+  final storage = new FlutterSecureStorage();
 
   @override
   void initState() {
@@ -21,13 +22,14 @@ class _UsersScreenState extends State<UsersScreen> {
       setState(() {
         token = data['token'];
         userId = data['userId'];
+        this.loading = false;
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return this.loading ? LoaderWidet() : Container(
       child: FutureBuilder(
         future: ApiService.getUsers(this.token),
         builder: (context, snapshot) {

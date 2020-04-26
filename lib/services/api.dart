@@ -5,7 +5,7 @@ import 'package:chatico/models/upload_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:chatico/models/sign_up.dart';
 
-String apiUrl = 'https://9357cc1e.ngrok.io';
+String apiUrl = 'https://85fd8478.ngrok.io';
 
 class ApiService {
   static Future<dynamic> signUp(SignUpModel model) async {

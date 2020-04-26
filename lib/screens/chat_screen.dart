@@ -157,14 +157,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       color: Colors.transparent,
                       child: Row(
                         children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              Icons.image,
-                              color: Color.fromRGBO(9, 188, 138, 1),
-                              size: 35,
-                            ),
-                          ),
                           Expanded(
                             child: Form(
                               key: _formKey,
