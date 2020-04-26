@@ -1,6 +1,7 @@
 import 'package:chatico/models/sign_up.dart';
 import 'package:chatico/screens/login.dart';
 import 'package:chatico/services/api.dart';
+import 'package:chatico/utils/common_methods.dart';
 import 'package:chatico/widgets/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,28 +27,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       try {
         await ApiService.signUp(this.model);
-        Fluttertoast.showToast(
-            msg: "Account create successfully!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Color.fromRGBO(9, 188, 138, 1),
-            textColor: Colors.white,
-            fontSize: 16.0);
+        CommonMethods.showSuccessToast('Account created successfully');
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => LoginScreen()));
       } catch (e) {
         setState(() {
           loading = false;
         });
-        Fluttertoast.showToast(
-            msg: "An error occured. Please try again!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        CommonMethods.showErrorToast('An error occured. Please try again!');
       }
     }
   }
@@ -135,12 +122,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                             borderRadius:
                                                 new BorderRadius.circular(11.0),
                                             borderSide: new BorderSide(
-                                                color: Color.fromRGBO(9, 188, 138, 1)),
+                                                color: Color.fromRGBO(
+                                                    9, 188, 138, 1)),
                                           ),
-                                          hasFloatingPlaceholder: true,
+                                          hasFloatingPlaceholder: false,
                                           alignLabelWithHint: true,
                                           filled: true,
-                                          labelText: 'Name',
+                                          hintText: 'Name',
                                           fillColor: Colors.transparent),
                                       validator: (value) {
                                         if (value.isEmpty) {
@@ -174,12 +162,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                                   new BorderRadius.circular(
                                                       11.0),
                                               borderSide: new BorderSide(
-                                                  color: Color.fromRGBO(9, 188, 138, 1)),
+                                                  color: Color.fromRGBO(
+                                                      9, 188, 138, 1)),
                                             ),
-                                            hasFloatingPlaceholder: true,
+                                            hasFloatingPlaceholder: false,
                                             alignLabelWithHint: true,
                                             filled: true,
-                                            labelText: 'Email',
+                                            hintText: 'Email',
                                             fillColor: Colors.transparent),
                                         validator: (value) {
                                           if (value.isEmpty) {
@@ -208,12 +197,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                             borderRadius:
                                                 new BorderRadius.circular(11.0),
                                             borderSide: new BorderSide(
-                                                color: Color.fromRGBO(9, 188, 138, 1)),
+                                                color: Color.fromRGBO(
+                                                    9, 188, 138, 1)),
                                           ),
-                                          hasFloatingPlaceholder: true,
+                                          hasFloatingPlaceholder: false,
                                           alignLabelWithHint: true,
                                           filled: true,
-                                          labelText: 'Username',
+                                          hintText: 'Username',
                                           fillColor: Colors.transparent),
                                       validator: (value) {
                                         if (value.isEmpty) {
@@ -251,12 +241,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                                   new BorderRadius.circular(
                                                       11.0),
                                               borderSide: new BorderSide(
-                                                  color: Color.fromRGBO(9, 188, 138, 1)),
+                                                  color: Color.fromRGBO(
+                                                      9, 188, 138, 1)),
                                             ),
-                                            hasFloatingPlaceholder: true,
+                                            hasFloatingPlaceholder: false,
                                             alignLabelWithHint: true,
                                             filled: true,
-                                            labelText: 'Password',
+                                            hintText: 'Password',
                                             fillColor: Colors.transparent),
                                         validator: (value) {
                                           if (value.isEmpty) {
@@ -272,12 +263,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     width: double.infinity,
                                     height: 50,
                                     child: OutlineButton(
-                                      highlightedBorderColor: Color.fromRGBO(9, 188, 138, 1),
-                                      focusColor: Color.fromRGBO(9, 188, 138, 1),
+                                      highlightedBorderColor:
+                                          Color.fromRGBO(9, 188, 138, 1),
+                                      focusColor:
+                                          Color.fromRGBO(9, 188, 138, 1),
                                       textColor: Color.fromRGBO(9, 188, 138, 1),
                                       highlightColor: Colors.white,
-                                      borderSide:
-                                          BorderSide(color: Color.fromRGBO(9, 188, 138, 1)),
+                                      borderSide: BorderSide(
+                                          color:
+                                              Color.fromRGBO(9, 188, 138, 1)),
                                       onPressed: this.submitForm,
                                       child: Text('Sign up'),
                                     ),

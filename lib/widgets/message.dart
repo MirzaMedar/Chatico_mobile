@@ -13,7 +13,8 @@ class Message extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Expanded(
-          child: Container(
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 200),
             margin: EdgeInsets.only(top: 10, left: !this.isMyMessage ? 200 : 10, right: this.isMyMessage ? 200 : 10, bottom: 10),
             padding: EdgeInsets.all(15),
             child: Text(

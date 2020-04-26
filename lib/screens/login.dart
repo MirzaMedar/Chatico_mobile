@@ -1,6 +1,7 @@
 import 'package:chatico/models/sign_in.dart';
 import 'package:chatico/screens/signup.dart';
 import 'package:chatico/services/api.dart';
+import 'package:chatico/utils/common_methods.dart';
 import 'package:chatico/widgets/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -40,8 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }).catchError((e) {
           showSessionExpiredToast();
         });
-      }
-      else {
+      } else {
         setState(() {
           this.loading = false;
         });
@@ -55,14 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void showSessionExpiredToast() {
-    Fluttertoast.showToast(
-        msg: 'Session expired',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Color.fromRGBO(23, 42, 58, 1),
-        textColor: Colors.white,
-        fontSize: 16.0);
+    CommonMethods.showErrorToast('Session expired');
   }
 
   void submitForm() async {
@@ -82,14 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
           loading = false;
         });
 
-        Fluttertoast.showToast(
-            msg: "Username or password is incorrect!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        CommonMethods.showErrorToast('Username or password is incorrect!');
       }
     } else {
       setState(() {
@@ -183,12 +169,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                           borderRadius:
                                               new BorderRadius.circular(11.0),
                                           borderSide: new BorderSide(
-                                              color: Color.fromRGBO(9, 188, 138, 1)),
+                                              color: Color.fromRGBO(
+                                                  9, 188, 138, 1)),
                                         ),
-                                        hasFloatingPlaceholder: true,
+                                        hasFloatingPlaceholder: false,
                                         alignLabelWithHint: true,
                                         filled: true,
-                                        labelText: 'Username',
+                                        hintText: 'Username',
                                         fillColor: Colors.transparent),
                                     validator: (value) {
                                       if (value.isEmpty) {
@@ -223,12 +210,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                             borderRadius:
                                                 new BorderRadius.circular(11.0),
                                             borderSide: new BorderSide(
-                                                color: Color.fromRGBO(9, 188, 138, 1)),
+                                                color: Color.fromRGBO(
+                                                    9, 188, 138, 1)),
                                           ),
-                                          hasFloatingPlaceholder: true,
+                                          hasFloatingPlaceholder: false,
                                           alignLabelWithHint: true,
                                           filled: true,
-                                          labelText: 'Password',
+                                          hintText: 'Password',
                                           fillColor: Colors.transparent),
                                       validator: (value) {
                                         if (value.isEmpty) {
@@ -244,11 +232,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   width: double.infinity,
                                   height: 50,
                                   child: OutlineButton(
-                                    highlightedBorderColor: Color.fromRGBO(9, 188, 138, 1),
+                                    highlightedBorderColor:
+                                        Color.fromRGBO(9, 188, 138, 1),
                                     focusColor: Color.fromRGBO(9, 188, 138, 1),
                                     textColor: Color.fromRGBO(9, 188, 138, 1),
                                     highlightColor: Colors.white,
-                                    borderSide: BorderSide(color: Color.fromRGBO(9, 188, 138, 1)),
+                                    borderSide: BorderSide(
+                                        color: Color.fromRGBO(9, 188, 138, 1)),
                                     onPressed: this.submitForm,
                                     child: Text('Log in'),
                                   ),

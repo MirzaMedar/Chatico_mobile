@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       builder: (context) => SocketProvider(),
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Chatico',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           // This is the theme of your application.
@@ -27,7 +27,6 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: Scaffold(
-          resizeToAvoidBottomPadding: false,
           body: LoginScreen(),
         ),
       ),

@@ -4,6 +4,8 @@ import 'package:chatico/screens/profile_screen.dart';
 import 'package:chatico/screens/recent_chats.dart';
 import 'package:chatico/screens/users.dart';
 import 'package:chatico/services/api.dart';
+import 'package:chatico/widgets/bottom_sheet_header_nav_item.dart';
+import 'package:chatico/widgets/bottom_sheet_menu_item.dart';
 import 'package:chatico/widgets/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -103,10 +105,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.transparent,
                     body: Scaffold(
                         appBar: AppBar(
-                          leading: Container(
-                            child: Icon(
-                              Icons.menu,
-                              color: Colors.white,
+                          leading: Padding(
+                            padding: const EdgeInsets.only(left: 20.0),
+                            child: Container(
+                              child: Image.asset('images/cellphone.png'),
                             ),
                           ),
                           elevation: 4,
@@ -166,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               this.currentPage = 0;
                                           });
                                         },
-                                        child: NavItem(
+                                        child: BottomSheetHeaderNavItem(
                                             text: 'Recent chats',
                                             icon: Icons.history,
                                             active: currentPage == 0),
@@ -196,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               this.currentPage = 1;
                                           });
                                         },
-                                        child: NavItem(
+                                        child: BottomSheetHeaderNavItem(
                                           text: 'Online users',
                                           icon: Icons.supervised_user_circle,
                                           active: currentPage == 1,
@@ -216,67 +218,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
                                   children: <Widget>[
-                                    GestureDetector(
-                                      onTap: this.goToProfile,
-                                      child: Column(
-                                        children: <Widget>[
-                                          Container(
-                                            padding: EdgeInsets.all(10),
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Color.fromRGBO(
-                                                  217, 217, 217, 0.5),
-                                            ),
-                                            child: Column(
-                                              children: <Widget>[
-                                                Icon(
-                                                  Icons.person,
-                                                  size: 40,
-                                                  color: Color.fromRGBO(
-                                                      9, 188, 138, 1),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Text(
-                                            'Profile',
-                                            style: TextStyle(
-                                                color: Colors.black54,
-                                                fontFamily: 'Moserrat',
-                                                fontSize: 20),
-                                          ),
-                                        ],
-                                      ),
+                                    BottomSheetMenuItem(
+                                      icon: Icons.person,
+                                      label: 'Profile',
+                                      toDo: this.goToProfile,
                                     ),
-                                    Column(
-                                      children: <Widget>[
-                                        Container(
-                                          padding: EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Color.fromRGBO(
-                                                217, 217, 217, 0.5),
-                                          ),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Icon(
-                                                Icons.settings,
-                                                size: 40,
-                                                color: Color.fromRGBO(
-                                                    9, 188, 138, 1),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Text(
-                                          'Settings',
-                                          style: TextStyle(
-                                              color: Colors.black54,
-                                              fontFamily: 'Moserrat',
-                                              fontSize: 20),
-                                        ),
-                                      ],
-                                    )
+                                    BottomSheetMenuItem(
+                                      icon: Icons.settings,
+                                      label: 'Settings',
+                                      toDo: () {},
+                                    ),
                                   ],
                                 ),
                                 Padding(
@@ -285,66 +236,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceEvenly,
                                     children: <Widget>[
-                                      Column(
-                                        children: <Widget>[
-                                          Container(
-                                            padding: EdgeInsets.all(10),
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Color.fromRGBO(
-                                                  217, 217, 217, 0.5),
-                                            ),
-                                            child: Column(
-                                              children: <Widget>[
-                                                Icon(
-                                                  Icons.share,
-                                                  size: 40,
-                                                  color: Color.fromRGBO(
-                                                      9, 188, 138, 1),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Text(
-                                            'Share',
-                                            style: TextStyle(
-                                                color: Colors.black54,
-                                                fontFamily: 'Moserrat',
-                                                fontSize: 20),
-                                          ),
-                                        ],
+                                      BottomSheetMenuItem(
+                                        icon: Icons.share,
+                                        label: 'Share',
+                                        toDo: () {},
                                       ),
-                                      GestureDetector(
-                                        onTap: this.logOut,
-                                        child: Column(
-                                          children: <Widget>[
-                                            Container(
-                                              padding: EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Color.fromRGBO(
-                                                    217, 217, 217, 0.5),
-                                              ),
-                                              child: Column(
-                                                children: <Widget>[
-                                                  Icon(
-                                                    Icons.power_settings_new,
-                                                    size: 40,
-                                                    color: Color.fromRGBO(
-                                                        9, 188, 138, 1),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Text(
-                                              'Log out',
-                                              style: TextStyle(
-                                                  color: Colors.black54,
-                                                  fontFamily: 'Moserrat',
-                                                  fontSize: 20),
-                                            ),
-                                          ],
-                                        ),
+                                      BottomSheetMenuItem(
+                                        icon: Icons.power_settings_new,
+                                        label: 'Log out',
+                                        toDo: this.logOut,
                                       ),
                                     ],
                                   ),
@@ -366,36 +266,6 @@ class _HomeScreenState extends State<HomeScreen> {
               )
             : LoaderWidet(),
       ),
-    );
-  }
-}
-
-class NavItem extends StatelessWidget {
-  final bool active;
-  final String text;
-  final IconData icon;
-
-  NavItem({this.text, this.icon, this.active});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(
-          this.icon,
-          size: 30,
-          color: this.active ? Color.fromRGBO(9, 188, 138, 1) : Colors.black54,
-        ),
-        Text(
-          this.text,
-          style: TextStyle(
-              color:
-                  this.active ? Color.fromRGBO(9, 188, 138, 1) : Colors.black54,
-              fontFamily: 'Monserrat',
-              fontSize: 15),
-        ),
-      ],
     );
   }
 }

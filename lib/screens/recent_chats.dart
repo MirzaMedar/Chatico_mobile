@@ -2,6 +2,7 @@ import 'package:chatico/screens/chat_screen.dart';
 import 'package:chatico/services/api.dart';
 import 'package:chatico/widgets/chat_item.dart';
 import 'package:chatico/widgets/loader.dart';
+import 'package:chatico/widgets/online_user_horizontal_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_socket_io/flutter_socket_io.dart';
@@ -34,7 +35,6 @@ class _RecentChatsScreenState extends State<RecentChatsScreen> {
     });
 
     this.initSocket().then((data) {
-      print('SOCKET INICIJALIZIRAN!');
       return;
     });
   }
@@ -82,45 +82,13 @@ class _RecentChatsScreenState extends State<RecentChatsScreen> {
                           bool isMe = snapshot.data['responseArray'][index]
                                   ['_id'] ==
                               userId;
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.all(3),
-                                  width: 70,
-                                  height: 70,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      width: 3,
-                                      color: Color.fromRGBO(9, 188, 138, 1),
-                                    ),
-                                  ),
-                                  child: CircleAvatar(
-                                    backgroundImage: snapshot
-                                                    .data['responseArray']
-                                                [index]['imageUrl'] ==
-                                            ''
-                                        ? ExactAssetImage('images/no-image.jpg')
-                                        : NetworkImage(
-                                            snapshot.data['responseArray']
-                                                [index]['imageUrl']),
-                                  ),
-                                ),
-                                Text(
-                                  snapshot.data['responseArray'][index]['name']
-                                      .toString(),
-                                  style: TextStyle(
-                                      decoration: TextDecoration.none,
-                                      color: Color.fromRGBO(23, 42, 58, 1),
-                                      fontFamily: 'Monserrat',
-                                      fontSize: 15),
-                                ),
-                              ],
-                            ),
-                          );
+                          return OnlineUserHorizontalListItem(
+                              name: snapshot.data['responseArray'][index]
+                                      ['name']
+                                  .toString(),
+                              imageUrl: snapshot.data['responseArray'][index]
+                                      ['imageUrl']
+                                  .toString());
                         });
                   } else
                     return LoaderWidet();

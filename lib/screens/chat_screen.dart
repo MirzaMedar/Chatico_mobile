@@ -30,6 +30,7 @@ class _ChatScreenState extends State<ChatScreen> {
   SocketIO socketIO;
   String loggedUserId;
   String newMessage = '';
+  final _formKey = GlobalKey<FormState>();
   final storage = new FlutterSecureStorage();
   var controller = new TextEditingController();
   ScrollController scrollController = ScrollController();
@@ -54,12 +55,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   _onMessageReceived(dynamic message) {
     this.setState(() {});
-    _scrollToListBottom();
-  }
-
-  _scrollToListBottom() {
-    scrollController.animateTo(scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
   }
 
   @override
@@ -120,16 +115,16 @@ class _ChatScreenState extends State<ChatScreen> {
                     future: ApiService.getChatMessages(widget.userId, token),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        _scrollToListBottom();
                         return ListView.builder(
+                          reverse: true,
                           controller: scrollController,
                           itemCount: snapshot.data['messages'].length,
                           itemBuilder: (context, index) {
                             return Message(
-                              message: snapshot.data['messages'][index]
-                                  ['message'],
-                              isMyMessage: snapshot.data['messages'][index]
-                                      ['senderId'] ==
+                              message: snapshot.data['messages'].reversed
+                                  .toList()[index]['message'],
+                              isMyMessage: snapshot.data['messages'].reversed
+                                      .toList()[index]['senderId'] ==
                                   widget.userId,
                             );
                           },
@@ -171,29 +166,46 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                           ),
                           Expanded(
-                            child: TextFormField(
-                              controller: this.controller,
-                              onChanged: (value) {
-                                this.newMessage = value;
-                              },
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                  errorStyle: TextStyle(height: 0),
-                                  border: new OutlineInputBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(11.0),
-                                    borderSide: new BorderSide(),
-                                  ),
-                                  focusedBorder: new OutlineInputBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(11.0),
-                                    borderSide: new BorderSide(
-                                        color: Color.fromRGBO(9, 188, 138, 1)),
-                                  ),
-                                  hasFloatingPlaceholder: true,
-                                  alignLabelWithHint: true,
-                                  filled: true,
-                                  fillColor: Colors.transparent),
+                            child: Form(
+                              key: _formKey,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                      height: 45,
+                                      child: TextFormField(
+                                        controller: this.controller,
+                                        onChanged: (value) {
+                                          this.newMessage = value;
+                                        },
+                                        textInputAction: TextInputAction.next,
+                                        decoration: InputDecoration(
+                                            errorStyle: TextStyle(height: 0),
+                                            border: new OutlineInputBorder(
+                                              borderRadius:
+                                                  new BorderRadius.circular(
+                                                      11.0),
+                                              borderSide: new BorderSide(),
+                                            ),
+                                            focusedBorder:
+                                                new OutlineInputBorder(
+                                              borderRadius:
+                                                  new BorderRadius.circular(
+                                                      11.0),
+                                              borderSide: new BorderSide(
+                                                  color: Color.fromRGBO(
+                                                      9, 188, 138, 1)),
+                                            ),
+                                            hasFloatingPlaceholder: true,
+                                            alignLabelWithHint: true,
+                                            filled: true,
+                                            fillColor: Colors.transparent),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                           Padding(
@@ -213,13 +225,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                 this.setState(() {
                                   this.newMessage = '';
                                   this.controller.clear();
-                                  this.scrollController.animateTo(
-                                        scrollController
-                                            .position.maxScrollExtent,
-                                        duration:
-                                            const Duration(milliseconds: 10),
-                                        curve: Curves.easeOut,
-                                      );
                                 });
                               },
                               child: Icon(
