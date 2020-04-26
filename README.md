@@ -2,6 +2,12 @@
 
 Chat application made with Flutter.
 
+# implemented concepts
+- Sockets (Socket.io)
+- File upload (profile image)
+- Share content
+- Push notifications (OneSignal)
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
