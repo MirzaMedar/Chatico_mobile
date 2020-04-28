@@ -5,7 +5,7 @@ import 'package:chatico/models/upload_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:chatico/models/sign_up.dart';
 
-String apiUrl = 'https://85fd8478.ngrok.io';
+String apiUrl = 'https://e0b0550d.ngrok.io';
 
 class ApiService {
   static Future<dynamic> signUp(SignUpModel model) async {
@@ -155,6 +155,24 @@ class ApiService {
       headers: {
         'Content-Type': 'application/json',
         'token': token,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var decoded = jsonDecode(response.body);
+      return Future.value(decoded);
+    }
+
+    return Future.value([]);
+  }
+
+  static Future<dynamic> setPlayerId(String token, String playerId) async {
+    var response = await http.get(
+      '$apiUrl/users/setPlayerId',
+      headers: {
+        'Content-Type': 'application/json',
+        'token': token,
+        'playerId': playerId
       },
     );
 

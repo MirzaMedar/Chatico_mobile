@@ -1,3 +1,4 @@
+import 'package:chatico/config/one_signal.dart';
 import 'package:chatico/providers/socket_provider.dart';
 import 'package:chatico/screens/login.dart';
 import 'package:chatico/screens/profile_screen.dart';
@@ -8,7 +9,6 @@ import 'package:chatico/widgets/bottom_sheet_header_nav_item.dart';
 import 'package:chatico/widgets/bottom_sheet_menu_item.dart';
 import 'package:chatico/widgets/loader.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_socket_io/flutter_socket_io.dart';
 import 'package:flutter_socket_io/socket_io_manager.dart';
@@ -23,10 +23,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String token;
   String userId;
+  String playerId;
   SocketIO socketIO;
   int currentPage = 0;
-  bool loading = false;
+  bool loading = true;
   final storage = new FlutterSecureStorage();
 
   List<Widget> pages = [
@@ -36,33 +38,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    super.initState();
     this.initSocket().then((data) {
       print('CONNECTED TO SOCKET!');
-      _initOneSignal();
+      _initOneSignal().then((data) {
+        setState(() {
+          currentPage = 0;
+          loading = false;
+        });
+      });
       return;
     });
-
-    setState(() {
-      currentPage = 0;
-    });
-
-    super.initState();
   }
 
-  // move this logic to login screen
-  _initOneSignal() {
-    OneSignal.shared.init('5f018259-14a3-47d1-bb4f-8e7542afe69d');
-    OneSignal.shared
+  Future<void> _initOneSignal() async {
+    await OneSignal.shared.init(ONE_SIGNAL_APP_ID);
+    await OneSignal.shared
         .setInFocusDisplayType(OSNotificationDisplayType.notification);
     OneSignal.shared.setNotificationReceivedHandler((notification) {
       print(notification);
     });
-
     //getting player id
-    OneSignal.shared.getPermissionSubscriptionState().then((status) {
-      print('status');
-      print(status.subscriptionStatus.userId);
-    }); 
+    OSPermissionSubscriptionState subcription =
+        await OneSignal.shared.getPermissionSubscriptionState();
+    this.playerId = subcription.subscriptionStatus.userId;
   }
 
   _socketStatus(dynamic data) {
@@ -71,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> initSocket() async {
     this.userId = await storage.read(key: 'userId');
+    this.token = await storage.read(key: 'token');
     print("USERID:${this.userId}");
 
     socketIO = SocketIOManager().createSocketIO(
@@ -85,8 +85,6 @@ class _HomeScreenState extends State<HomeScreen> {
     socketIO.init(query: "userId=${this.userId}");
 
     socketIO.connect();
-
-    return Future.value();
   }
 
   void goToProfile() {
@@ -120,174 +118,192 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       child: SafeArea(
         child: !this.loading
-            ? Container(
-                child: Scaffold(
-                  bottomNavigationBar: SlidingUpPanel(
-                    minHeight: 70,
-                    maxHeight: height,
-                    backdropEnabled: true,
-                    backdropColor: Colors.transparent,
-                    color: Colors.transparent,
-                    body: Scaffold(
-                        appBar: AppBar(
-                          leading: Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: Container(
-                              child: Image.asset('images/cellphone.png'),
-                            ),
-                          ),
-                          elevation: 4,
-                          actions: <Widget>[
-                            GestureDetector(
-                              onTap: logOut,
-                              child: Container(
-                                margin: EdgeInsets.only(right: 10),
-                                child: Icon(
-                                  Icons.power_settings_new,
-                                  color: Colors.white,
+            ? FutureBuilder(
+                future: ApiService.setPlayerId(this.token, this.playerId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Container(
+                      child: Scaffold(
+                        bottomNavigationBar: SlidingUpPanel(
+                          minHeight: 70,
+                          maxHeight: height,
+                          backdropEnabled: true,
+                          backdropColor: Colors.transparent,
+                          color: Colors.transparent,
+                          body: Scaffold(
+                              appBar: AppBar(
+                                leading: Padding(
+                                  padding: const EdgeInsets.only(left: 20.0),
+                                  child: Container(
+                                    child: Image.asset('images/cellphone.png'),
+                                  ),
+                                ),
+                                elevation: 4,
+                                actions: <Widget>[
+                                  GestureDetector(
+                                    onTap: logOut,
+                                    child: Container(
+                                      margin: EdgeInsets.only(right: 10),
+                                      child: Icon(
+                                        Icons.power_settings_new,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                                backgroundColor:
+                                    Color.fromRGBO(61, 166, 94, 0.9),
+                                title: Text(
+                                  'Chatico',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'Monserrat',
+                                      fontSize: 20),
                                 ),
                               ),
-                            ),
-                          ],
-                          backgroundColor: Color.fromRGBO(61, 166, 94, 0.9),
-                          title: Text(
-                            'Chatico',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'Monserrat',
-                                fontSize: 20),
-                          ),
-                        ),
-                        body: pages[this.currentPage]),
-                    panel: Container(
-                      width: double.infinity,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.only(
-                              left: 20,
-                              right: 20,
-                            ),
-                            padding: EdgeInsets.only(bottom: 20),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                    width: 1.0, color: Colors.grey[200]),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              body: pages[this.currentPage]),
+                          panel: Container(
+                            width: double.infinity,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10.0),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            if (this.currentPage != 0)
-                                              this.currentPage = 0;
-                                          });
-                                        },
-                                        child: BottomSheetHeaderNavItem(
-                                            text: 'Recent chats',
-                                            icon: Icons.history,
-                                            active: currentPage == 0),
-                                      ),
+                                Container(
+                                  margin: EdgeInsets.only(
+                                    left: 20,
+                                    right: 20,
+                                  ),
+                                  padding: EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.0, color: Colors.grey[200]),
                                     ),
-                                  ],
-                                ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.keyboard_arrow_up,
-                                      color: Colors.grey,
-                                      size: 20,
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10.0),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            if (this.currentPage != 1)
-                                              this.currentPage = 1;
-                                          });
-                                        },
-                                        child: BottomSheetHeaderNavItem(
-                                          text: 'Online users',
-                                          icon: Icons.supervised_user_circle,
-                                          active: currentPage == 1,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20),
-                            child: Column(
-                              children: <Widget>[
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: <Widget>[
-                                    BottomSheetMenuItem(
-                                      icon: Icons.person,
-                                      label: 'Profile',
-                                      toDo: this.goToProfile,
-                                    ),
-                                    BottomSheetMenuItem(
-                                      icon: Icons.settings,
-                                      label: 'Settings',
-                                      toDo: () {},
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20.0),
+                                  ),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      BottomSheetMenuItem(
-                                        icon: Icons.share,
-                                        label: 'Share',
-                                        toDo: this.shareApp,
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 10.0),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  if (this.currentPage != 0)
+                                                    this.currentPage = 0;
+                                                });
+                                              },
+                                              child: BottomSheetHeaderNavItem(
+                                                  text: 'Recent chats',
+                                                  icon: Icons.history,
+                                                  active: currentPage == 0),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      BottomSheetMenuItem(
-                                        icon: Icons.power_settings_new,
-                                        label: 'Log out',
-                                        toDo: this.logOut,
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.keyboard_arrow_up,
+                                            color: Colors.grey,
+                                            size: 20,
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 10.0),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  if (this.currentPage != 1)
+                                                    this.currentPage = 1;
+                                                });
+                                              },
+                                              child: BottomSheetHeaderNavItem(
+                                                text: 'Online users',
+                                                icon: Icons
+                                                    .supervised_user_circle,
+                                                active: currentPage == 1,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
                                 ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: Column(
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: <Widget>[
+                                          BottomSheetMenuItem(
+                                            icon: Icons.person,
+                                            label: 'Profile',
+                                            toDo: this.goToProfile,
+                                          ),
+                                          BottomSheetMenuItem(
+                                            icon: Icons.settings,
+                                            label: 'Settings',
+                                            toDo: () {},
+                                          ),
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 20.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: <Widget>[
+                                            BottomSheetMenuItem(
+                                              icon: Icons.share,
+                                              label: 'Share',
+                                              toDo: this.shareApp,
+                                            ),
+                                            BottomSheetMenuItem(
+                                              icon: Icons.power_settings_new,
+                                              label: 'Log out',
+                                              toDo: this.logOut,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
                               ],
                             ),
-                          )
-                        ],
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10)),
+                            ),
+                          ),
+                        ),
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10)),
-                      ),
-                    ),
-                  ),
-                ),
+                    );
+                  }
+                  return LoaderWidet();
+                },
               )
             : LoaderWidet(),
       ),

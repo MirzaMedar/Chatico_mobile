@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:chatico/providers/socket_provider.dart';
 import 'package:chatico/services/api.dart';
+import 'package:chatico/utils/common_methods.dart';
 import 'package:chatico/widgets/loader.dart';
 import 'package:chatico/widgets/message.dart';
 import 'package:flutter/material.dart';
@@ -129,7 +130,9 @@ class _ChatScreenState extends State<ChatScreen> {
                             );
                           },
                         );
-                      }
+                      } else if (snapshot.hasError)
+                        CommonMethods.showErrorToast(
+                            'An error occured while getting messages!');
                       return LoaderWidet();
                     },
                   ),
